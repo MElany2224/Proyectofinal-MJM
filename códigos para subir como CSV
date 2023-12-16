@@ -1,0 +1,39 @@
+--Después de esto utilizamos el siguiente codigo para subir los archivos al contenedor
+—Cosecha.csv
+
+docker cp "C:\Users\maria\AntoagrariasdbA\Cosecha.csv" antoagrariasdba-postgres-1:/docker-entrypoint-initdb.d/
+
+–Cultivo.csv 
+
+docker cp "C:\Users\maria\AntoagrariasdbA\Cultivo.csv" antoagrariasdba-postgres-1:/docker-entrypoint-initdb.d/
+
+—Parcela.csv
+
+docker cp "C:\Users\maria\AntoagrariasdbA\Parcela.csv" antoagrariasdba-postgres-1:/docker-entrypoint-initdb.d/
+
+–Sensor.csv
+
+docker cp "C:\Users\maria\AntoagrariasdbA\Sensor.csv" antoagrariasdba-postgres-1:/docker-entrypoint-initdb.d/
+
+--Luego de esto conectamos la consola de PostgreSQL en el contenedor, y cargamos los datos de los archivos con el siguiente comando.
+
+Antoagrariasdb=#
+\COPY Cosecha FROM '/docker-entrypoint-initdb.d/Cosecha.csv' WITH CSV HEADER;
+
+–mensaje por pantalla 
+COPY 10
+
+\COPY Cultivo FROM '/docker-entrypoint-initdb.d/Cultivo.csv' WITH CSV HEADER;
+
+–mensaje por pantalla
+COPY 15
+
+\COPY Parcela FROM '/docker-entrypoint-initdb.d/Parcela.csv' WITH CSV HEADER;
+
+–mensaje por pantalla
+COPY 10
+
+\COPY Sensor (cod_sensor, datosclima_humedad, datosclima_temperatura, datosclima_precipitacion, ID_parcela) FROM '/docker-entrypoint-initdb.d/Sensor.csv' WITH CSV HEADER;
+
+–mensaje por pantalla
+COPY 10
