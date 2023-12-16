@@ -1,0 +1,103 @@
+-- Para hacer el análisis de datos utilizamos rstudio primero en la terminal, nos conectamos en la consola de R para descargar las siguientes bibliotecas 
+
+--Entrar a la consola de Rstudio
+
+docker exec -it antoagrariasdba-rstudio-1 bash
+
+--bibliotecas de desarrollo de PostgreSQL
+
+apt-get update
+apt-get install -y libpq-dev
+
+------------------------------------------------------------------------------------------
+
+--Entramos a Rstudio por el navegador, digitamos el usuario y contraseña correspondiente, dentro de Rstudio en nuestro Scrip digitamos estos código: 
+
+install.packages('RPostgreSQL', dependencies=TRUE)
+library(RPostgreSQL)
+library(DBI)
+
+con <- dbConnect(PostgreSQL(), dbname = "Antoagrariasdb", user = "pinito6", password = "pinito6", host = "postgres", port = 5432)
+
+cosecha <- dbGetQuery(con, "SELECT * FROM Cosecha;")
+cultivo <- dbGetQuery(con, "SELECT * FROM Cultivo;")
+parcela <- dbGetQuery(con, "SELECT * FROM Parcela;")
+sensor <- dbGetQuery(con, "SELECT * FROM Sensor;")
+
+------------------------------------------------------------------------------------------
+
+-- scrip que implementamos para realizar los graficos en Rstudio--
+
+--1.Cantidad de cosechas por mes 
+
+library(ggplot2)
+--------------------------------------------------------------------------------
+#Cantidad de cosecha por mes 
+
+ggplot(cosecha, aes(x = mes, y = cantidad)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Cantidad de Cosecha por Mes", x = "Mes", y = "Cantidad") +
+  scale_x_continuous(breaks = 1:12, labels = month.name[1:12])
+
+--2. Relación entre humedad, temperatura y precipitación por parcela 
+
+#Registro de datos del clima en sensor 
+  
+  ggplot(sensor, aes(x = datosclima_humedad, y = datosclima_temperatura, color = datosclima_precipitacion)) +
+  geom_point() +
+  facet_wrap(~id_parcela, scales = "free") +
+  labs(title = "Relación entre Humedad, Temperatura y Precipitación por Parcela",
+       x = "Humedad",
+       y = "Temperatura",
+       color = "Precipitación") +
+  theme_minimal()
+
+--3. Cantidad de parcelas por técnica de riego
+
+ggplot(parcela, aes(y = factor(tecnica_riego))) +
+  geom_bar(fill = "blue") +
+  labs(title = "Cantidad de Parcelas por Técnica de Riego",
+       x = "Cantidad de Parcelas",
+       y = "Técnica de Riego") +
+  theme_minimal()
+
+--4. Rendimiento de cultivo por tipo de suelo 
+
+##Rendimiento de cultivo por tipo de suelo 
+    
+    query <- "SELECT
+            P.tipo_suelo,
+            C.nombre AS nombre_cultivo,
+            CO.cantidad AS rendimiento
+          FROM
+            Parcela P
+          JOIN
+            Cultivo C ON P.ID_cultivo = C.ID_cultivo
+          JOIN
+            Cosecha CO ON C.ID_cosecha = CO.ID_cosecha;"
+  
+  resultadosq <- dbGetQuery(con, query)
+  
+  head(resultadosq)
+  
+  ggplot(resultadosq, aes(x = tipo_suelo, y = rendimiento, fill = nombre_cultivo)) +
+    geom_bar(stat = "identity", position = "stack") +
+    labs(title = "Rendimiento de Cultivos por Tipo de Suelo",
+         x = "Tipo de Suelo",
+         y = "Rendimiento",
+         fill = "Nombre del Cultivo") +
+    theme_minimal()
+
+--5. Mantenimiento por técnica de suelo
+
+##Mantenimiento por tecnica de suelo 
+    
+  ggplot(parcela, aes(x = factor(tecnica_suelo), fill = mantenimiento)) +
+    geom_bar(position = "dodge", stat = "count") +
+    labs(title = "Mantenimiento por Técnica de Suelo",
+         x = "Técnica de Suelo",
+         y = "Cantidad de Parcelas") +
+    scale_fill_manual(values = c("Excelente" = "green", "Bueno" = "blue", "Regular" = "orange")) +
+    theme_minimal() +
+    coord_flip()
+
