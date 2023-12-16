@@ -1,0 +1,179 @@
+--Nota: Al estar en la consola esta es la ruta/ubicación que muestra, aquí es donde digital el código (C:\Users\maria\AntoagrariasdbA>)
+docker exec -it antoagrariasdba-postgres-1 psql -U pinito6 -d Antoagrariasdb
+
+--Nota: Al estar en la consola de PostgresSQL esta es la ruta/ubicación que muestra, aquí es donde digital el código (Antoagrariasdb=#)
+
+CREATE TABLE Cosecha(
+    ID_cosecha INT PRIMARY KEY,
+    cod_funcionario INT,
+    cantidad INT,
+    mes INT,
+    dia INT,
+    anio INT
+);
+
+
+CREATE TABLE Cultivo(
+    ID_cultivo INT PRIMARY KEY,
+    nombre VARCHAR(255),
+    ciclo_crecimiento INT,
+    ID_cosecha INT,
+    FOREIGN KEY (ID_cosecha) REFERENCES Cosecha(ID_cosecha)
+);
+
+CREATE TABLE Parcela(
+    ID_parcela INT PRIMARY KEY,
+    ubicacion VARCHAR(600),
+    tamaño INT,
+    tipo_suelo VARCHAR(255),
+    tecnica_suelo VARCHAR(255),
+    tecnica_riego VARCHAR(255),
+    mantenimiento VARCHAR(255),
+    propietario VARCHAR(255),
+    practica_A VARCHAR(255),
+    ID_cultivo INT,
+    FOREIGN KEY (ID_cultivo) REFERENCES Cultivo(ID_cultivo)
+);
+
+CREATE TABLE Sensor(
+    cod_sensor INT PRIMARY KEY,
+    datosclima_humedad VARCHAR(600),
+    datosclima_temperatura VARCHAR(600),
+    datosclima_precipitacion VARCHAR(600),
+    ID_parcela INT,
+    FOREIGN KEY (ID_parcela) REFERENCES Parcela(ID_parcela)
+);
+
+-- insertar dactos --
+-- cosecha--
+INSERT INTO cosecha(ID_cosecha, cod_funcionario, cantidad, mes, dia, anio) VALUES
+(1, 101, 20, 1, 5, 2023),
+(2, 102, 15, 2, 10, 2023),
+(3, 103, 25, 3, 15, 2023),
+(4, 104, 30, 4, 20, 2023),
+(5, 105, 18, 5, 25, 2023),
+(6, 106, 22, 6, 1, 2023),
+(7, 107, 28, 7, 6, 2023),
+(8, 108, 17, 8, 11, 2023),
+(9, 109, 23, 9, 16, 2023),
+(10, 110, 21, 10, 21, 2023);
+
+--cultivo--
+INSERT INTO Cultivo(ID_cultivo, nombre, ciclo_crecimiento, ID_cosecha) VALUES
+(12, 'Tomate', 90, 3),
+(7, 'Maíz', 120, 7),
+(5, 'Lechuga', 60, 2),
+(11, 'Frijol', 80, 8),
+(8, 'Zanahoria', 100, 6),
+(14, 'Pepino', 70, 5),
+(9, 'Papa', 110, 1),
+(15, 'Calabacín', 75, 10),
+(6, 'Cebolla', 95, 9),
+(10, 'Brócoli', 85, 4),
+(13, 'Espinaca', 50, 2),
+(4, 'Coliflor', 80, 1),
+(3, 'Acelga', 65, 6),
+(2, 'Repollo', 110, 9),
+(1, 'Ajo', 120, 5);
+
+--Parcela--
+INSERT INTO Parcela(ID_parcela, ubicacion, tamaño, tipo_suelo, tecnica_suelo, tecnica_riego, mantenimiento, propietario, practica_A, ID_cultivo) VALUES
+(101, 'Finca A', 200, 'Arcilloso', 'Labranza convencional', 'Riego por goteo', 'Regular', 'Juan Pérez', 'Rotación de cultivos', 12),
+(102, 'Granja B', 150, 'Arenoso', 'Labranza mínima', 'Riego por aspersión', 'Bueno', 'María Rodríguez', 'Abono orgánico', 7),
+(103, 'Hacienda C', 180, 'Franco', 'Siembra directa', 'Riego por gravedad', 'Excelente', 'Carlos López', 'Siembra directa', 5),
+(104, 'Campo D', 120, 'Arcilloso', 'Labranza convencional', 'Riego por goteo', 'Bueno', 'Ana Martínez', 'Rotación de cultivos', 11),
+(105, 'Estancia E', 250, 'Arenoso', 'Labranza convencional', 'Riego por aspersión', 'Regular', 'José Gómez', 'Abono orgánico', 8),
+(106, 'Rancho F', 160, 'Franco', 'Labranza mínima', 'Riego por gravedad', 'Excelente', 'Elena Sánchez', 'Cosecha cero', 14),
+(107, 'Quinta G', 220, 'Arcilloso', 'Siembra directa', 'Riego por goteo', 'Bueno', 'Pedro Fernández', 'Labranza convencional', 9),
+(108, 'Chacra H', 130, 'Arenoso', 'Cosecha cero', 'Riego por aspersión', 'Regular', 'Luisa Ramirez', 'Labranza mínima', 10),
+(109, 'Parcela I', 190, 'Franco', 'Siembra directa', 'Riego por gravedad', 'Excelente', 'Jorge Castro', 'Rotación de cultivos', 4),
+(110, 'Campo J', 170, 'Arcilloso', 'Labranza mínima', 'Riego por goteo', 'Bueno', 'Laura González', 'Abono orgánico', 1);
+
+--sensor--
+INSERT INTO Sensor(cod_sensor, datosclima_humedad, datosclima_temperatura, datosclima_precipitacion, ID_parcela) VALUES
+(01, '50%', '28°C', '10mm', 101),
+(02, '45%', '29°C', '8mm', 102),
+(03, '60%', '26°C', '5mm', 103),
+(04, '55%', '27°C', '6mm', 104),
+(05, '52%', '25°C', '9mm', 105),
+(06, '65%', '24°C', '7mm', 106),
+(07, '55%', '23°C', '8mm', 107),
+(08, '48%', '31°C', '11mm', 108),
+(09, '62%', '22°C', '6mm', 109),
+(10, '52%', '29°C', '5mm', 110);
+
+--CONSULTAS-- 
+--Para este último punto, utilizamos la última conexión que hicimos en el archivo yml; entonces entramos por el navegador a pgAdmin y hacemos la conexión con 
+--el servidor de postgres, y abrimos Query Tool. Generamos algunas consultas que estiman datos que sirven y facilitan el manejo de la base de datos. 
+
+-- 1. Cuál es la información del sensor del propietario María Rodriguez según la parcela que maneja.
+SELECT Sensor.*, Parcela.propietario
+FROM Sensor
+JOIN Parcela ON Sensor.ID_parcela = Parcela.ID_parcela
+WHERE Parcela.propietario = 'María Rodríguez';
+
+-- 2. tipo de suelo que tiene el cultivo Zanahoria.
+SELECT Parcela.tipo_suelo
+FROM Parcela
+JOIN Cultivo ON Parcela.ID_cultivo = Cultivo.ID_cultivo
+WHERE Cultivo.nombre = 'Zanahoria';
+
+-- 3. cual es el nombre del cultivo con la mayor cantidad cosechada.
+SELECT Cultivo.nombre
+FROM Cultivo
+JOIN Cosecha ON Cultivo.ID_cosecha = Cosecha.ID_cosecha
+ORDER BY Cosecha.cantidad DESC
+LIMIT 1;
+
+-- 4. el mes, dia y anio del sensor con temperatura de 27°C
+SELECT Cosecha.mes, Cosecha.dia, Cosecha.anio, Sensor.datosclima_temperatura
+FROM Cosecha
+LEFT JOIN Cultivo ON Cosecha.ID_cosecha = Cultivo.ID_cosecha
+LEFT JOIN Parcela ON Cultivo.ID_cultivo = Parcela.ID_cultivo
+LEFT JOIN Sensor ON Parcela.ID_parcela = Sensor.ID_parcela
+WHERE Sensor.datosclima_temperatura = '27°C';
+
+-- 5. Listar el nombre de los cultivos y sus prácticas de mantenimiento que sean excelente.
+SELECT Cultivo.nombre AS nombre_cultivo, Parcela.mantenimiento
+FROM Cultivo
+JOIN Parcela ON Cultivo.ID_cultivo = Parcela.ID_cultivo
+WHERE Parcela.mantenimiento = 'Excelente';
+
+-- 6. Tamaño de las parcelas con cultivos de Maíz, Pepino y Frijol
+SELECT Parcela.ID_parcela, Parcela.ubicacion, Parcela.tamaño, Cultivo.nombre AS cultivo
+FROM Parcela
+JOIN Cultivo ON Parcela.ID_cultivo = Cultivo.ID_cultivo
+WHERE Cultivo.nombre IN ('Maíz', 'Pepino', 'Frijol');
+
+--7. cual es tecnica de riego mas utilizada.
+SELECT 
+    Parcela.tecnica_riego AS Tecnica_Riego,
+    COUNT(*) AS Cantidad
+FROM Parcela 
+JOIN Cultivo on Parcela.ID_cultivo = Cultivo.ID_cultivo
+GROUP BY Parcela.tecnica_riego
+ORDER BY Cantidad DESC
+LIMIT 1;
+
+-- 8. muestre el registro de la parcela con mayor huemdad y el nombre de los cultivos en la parcela.
+SELECT Parcela.ID_parcela, Sensor.datosclima_humedad, Cultivo.nombre AS nombre_cultivo
+FROM Sensor
+JOIN Parcela ON Sensor.ID_parcela = Parcela.ID_parcela
+JOIN Cultivo ON Parcela.ID_cultivo = Cultivo.ID_cultivo
+WHERE Sensor.datosclima_humedad = (
+    SELECT MAX(datosclima_humedad) FROM Sensor
+)
+LIMIT 1;
+
+-- 9. Mostrar las parcelas que utilizan la práctica agrícola "Rotación de cultivos" y que tienen un ciclo de crecimiento de cultivo superior a 85 días
+SELECT Parcela.ID_parcela, Parcela.practica_a, Cultivo.ciclo_crecimiento
+FROM Parcela
+JOIN Cultivo ON Parcela.ID_cultivo = Cultivo.ID_cultivo
+WHERE Parcela.practica_a = 'Rotación de cultivos' AND Cultivo.ciclo_crecimiento > 85;
+
+-- 10. Encontrar los cultivos que tienen un ciclo de crecimiento superior a 100 días y fueron cultivados en parcelas con tecnica_riego 'Riego por goteo'
+SELECT cultivo.nombre,cultivo.ciclo_crecimiento, Parcela.tecnica_riego
+FROM Cultivo
+JOIN Parcela ON Cultivo.ID_cultivo = Parcela.ID_cultivo
+WHERE Cultivo.ciclo_crecimiento > 100 AND Parcela.tecnica_riego = 'Riego por goteo';
+
